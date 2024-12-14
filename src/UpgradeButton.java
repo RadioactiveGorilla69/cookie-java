@@ -12,12 +12,14 @@ public class UpgradeButton {
 
 	public UpgradeButton(int upgradeNumber, Upgrade upgrade, JPanel panel, CookieClickerGame game) {
 		
-		JButton button = new JButton();
+		button = new JButton();
 		JLabel tooltip = new JLabel();
 		tooltip.setFont(new Font("Comic Sans MS", Font.PLAIN, 16));
 		button.setText(upgrade.getUpgradeName());
 		button.setFont(new Font("Comic Sans MS", Font.PLAIN, 20));
-		button.setBounds(1236, 100, 100, 100);
+		button.setBounds(1236, 100, 80, 80);
+		
+		
 
 		button.addActionListener(new ActionListener() {
 
@@ -26,12 +28,13 @@ public class UpgradeButton {
 				if(game.getCurrentCookies() >= upgrade.getPrice()) {
 					game.addToPurchasedUpgrades(upgrade);
 					game.setCurrentCookies(game.getCurrentCookies() - upgrade.getPrice());
+					panel.remove(button);
+					panel.remove(tooltip);
 					button.setVisible(false);
-					//game.getPurchasedUpgrades().get(upgradeNumber).buyUpgrade(game, upgrade);
+					panel.revalidate();
+					panel.repaint();
+					System.out.println(button.isVisible());
 				}
-				else {
-				}
-
 			}
 		});
 
@@ -73,6 +76,10 @@ public class UpgradeButton {
 		panel.add(button);
 		panel.add(tooltip);
 
+	}
+	
+	public void setUpgradeVisible(boolean b) {
+		button.setVisible(b);
 	}
 
 }

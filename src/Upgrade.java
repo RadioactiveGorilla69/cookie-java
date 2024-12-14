@@ -16,16 +16,6 @@ public class Upgrade {
 		this.upgradeNumber = upgradeNumber;
 	}
 
-	//FIX THIS |
-	//FIX THIS |
-	//FIX THIS |
-	//FIX THIS v
-	
-	public void buyUpgrade(CookieClickerGame game, Upgrade u) {
-		game.addToPurchasedUpgrades(u);
-		game.setCurrentCookies(game.getCurrentCookies() - u.price);
-	}
-
 	public double getTotalMult() {
 		return totalMult;
 	}
@@ -40,6 +30,10 @@ public class Upgrade {
 
 	public int getPrice() {
 		return price;
+	}
+	
+	public int getUpgradeNumber() {
+		return upgradeNumber;
 	}
 	
 }

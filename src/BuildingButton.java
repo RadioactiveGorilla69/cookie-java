@@ -51,7 +51,7 @@ public class BuildingButton {
 					tooltip.setText("???");
 				}
 				else{
-					tooltip.setText("<html>" + building.getBuildingCount() + " " + building.getName() + " making " + building.getCookiesPerSecond()*building.getBuildingCount()*(game.getPurchasedUpgrades().get(buildingNumber).getTotalMult()) + " cookies per second" + "<br>" + ((building.getCookiesPerSecond()*building.getBuildingCount()*100)/cPS) + "% cookies per second" + "</html>");
+					tooltip.setText("<html>" + building.getBuildingCount() + " " + building.getName() + " making " + game.makeCookiesPerSecond(game.getBuildings(), game.getPurchasedUpgrades()) + " cookies per second" + "<br>" + ((building.getCookiesPerSecond()*building.getBuildingCount()*100*game.getPurchasedUpgradeCursorPercent(game.getPurchasedUpgrades()))/cPS) + "% cookies per second" + "</html>");
 				}
 
 				tooltip.setBounds(1036, 250+(120*buildingNumber), 200, 120);

@@ -12,7 +12,11 @@ public class CookieClickerGame {
 	private ArrayList<Upgrade> availableUpgrades = new ArrayList<Upgrade>();
 	private ArrayList<Upgrade> purchasedUpgrades = new ArrayList<Upgrade>();
 	private ArrayList<Upgrade> upgradeStorage = new ArrayList<Upgrade>();
-	
+	Upgrade test = new Upgrade("Test", 1, 100, 5, 0);
+	Upgrade cursorTest = new Upgrade("Cursor Test", 1, 2, 20, 1);
+	private UpgradeButton cursorTestButton;
+
+
 	public static void main(String[] args) {
 		JFrame frame = new JFrame();
 		frame.setSize(1536, 864);
@@ -20,17 +24,15 @@ public class CookieClickerGame {
 		JPanel panel = new JPanel();
 		panel.setLayout(null);
 		panel.setBounds(0, 0, 800, 600);
-		panel.setBackground(Color.LIGHT_GRAY);
+		panel.setBackground(new Color(50,130,200));
 
-		JLabel labelCurrentCookies = new JLabel();
-		labelCurrentCookies.setBounds(275, 100, 200, 50);
-		labelCurrentCookies.setFont(new Font("Comic Sans MS", Font.PLAIN, 24));
-		frame.add(labelCurrentCookies);
-
-		JLabel labelCPS = new JLabel();
-		labelCPS.setBounds(275, 125, 300, 50);
-		labelCPS.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
-		frame.add(labelCPS);
+		JLabel labelCookies = new JLabel();
+		labelCookies.setBounds(50, 100, 400, 100);
+		labelCookies.setOpaque(true);
+		labelCookies.setBackground(new Color(111, 111, 111, 180));
+		labelCookies.setFont(new Font("Comic Sans MS", Font.PLAIN, 20));
+		labelCookies.setHorizontalAlignment(JLabel.CENTER);
+		frame.add(labelCookies);
 
 		frame.add(panel);
 
@@ -38,29 +40,27 @@ public class CookieClickerGame {
 		Cookie bigCookie = new Cookie(panel, game);
 
 		game.createBuildings(game);
-		
+
 		game.createBuildingButtons(panel, game);
 
-		Upgrade test = new Upgrade("Test", 1, 2, 20, 0);
-		//game.upgradeStorage.add(test);
-		game.availableUpgrades.add(test);
-		UpgradeButton testButton = new UpgradeButton(0, test, panel, game);
-		Upgrade cursorTest = new Upgrade("Cursor Test", 1, 2, 20, 1);
-		game.upgradeStorage.add(cursorTest);
-		
-		panel.setComponentZOrder(labelCurrentCookies, 0);
-        panel.setComponentZOrder(labelCPS, 0);
+
+		game.availableUpgrades.add(game.test);
+		game.availableUpgrades.add(game.cursorTest);
+		UpgradeButton testButton = new UpgradeButton(0, game.test, panel, game);
+		game.cursorTestButton = new UpgradeButton(1, game.cursorTest, panel, game);
+		game.cursorTestButton.setUpgradeVisible(false);
+
+		panel.setComponentZOrder(labelCookies, 1);
 		frame.setVisible(true);
 
 		while(true) {
-			if(game.getPurchasedUpgrades().size() > 1) System.out.println("true lol");
+			game.addAvailableUpgrades(game, panel);
+			//System.out.println(game.purchasedUpgrades.size());
 			game.updateCurrentCookies();
-			//System.out.println(game.getBuildings()[0].getPrice() + "	" + game.getBuildings()[0].getBuildingCount());
-			labelCurrentCookies.setText("Cookies: " + game.getCurrentCookies());
 			int cPS = game.makeCookiesPerSecond(game.buildings, game.purchasedUpgrades);
-			labelCPS.setText("Cookies Per Second: " + cPS);
-			game.addAvailableUpgrades(game, panel, game.upgradeStorage);
-			
+			labelCookies.setText("<html>Cookies: " + game.getCurrentCookies() + "<br><span style='font-size:14px;'>per second: " + cPS + "</html>");
+
+
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
@@ -125,7 +125,7 @@ public class CookieClickerGame {
 	public void removeFromAvailableUpgrades(int upgradeNumber) {
 		availableUpgrades.remove(upgradeNumber);
 	}
-	
+
 	public void createBuildingButtons(JPanel panel, CookieClickerGame game) {
 		new BuildingButton(0, panel, game);
 		new BuildingButton(1, panel, game);
@@ -133,7 +133,7 @@ public class CookieClickerGame {
 		new BuildingButton(3, panel, game);
 		new BuildingButton(4, panel, game);
 	}
-	
+
 	public void createBuildings(CookieClickerGame game) {
 		game.buildings[0] = new Building("Cursor", 1, 10, 0);
 		game.buildings[1] = new Building("Grandma", 15, 100, 0);
@@ -141,13 +141,32 @@ public class CookieClickerGame {
 		game.buildings[3] = new Building("Mine", 250, 10000, 0);
 		game.buildings[4] = new Building("Factory", 2000, 50000, 0);
 	}
-	
-	public void addAvailableUpgrades(CookieClickerGame game, JPanel panel, ArrayList<Upgrade> upgradeStorage) {
-		if(!game.purchasedUpgrades.contains(upgradeStorage.get(0)));
+
+	public void addAvailableUpgrades(CookieClickerGame game, JPanel panel) {
+		if(game.purchasedUpgrades.contains(game.availableUpgrades.get(1)) == false) {
 			if(game.buildings[0].getBuildingCount() > 9) {
-				game.availableUpgrades.add((Upgrade)upgradeStorage.get(0));
-				UpgradeButton cursorTestButton = new UpgradeButton(1, (Upgrade)upgradeStorage.get(0), panel, game);
+				game.cursorTestButton.setUpgradeVisible(true);
+			}
 		}
+
 	}
-	
+
+	public double getPurchasedUpgradeTotalPercent(ArrayList<Upgrade> purchasedUpgrades) {
+		double totalMult = 1;
+		for(int i = 0; i < purchasedUpgrades.size(); i++) {
+			totalMult *= purchasedUpgrades.get(i).getTotalMult();
+		}
+		return totalMult;
+	}
+
+	public double getPurchasedUpgradeCursorPercent(ArrayList<Upgrade> purchasedUpgrades) {
+		double cursorMult = 1;
+		for(int i = 0; i < purchasedUpgrades.size(); i++) {
+			if(purchasedUpgrades.get(i).getUpgradeNumber() == 1) {
+				cursorMult *= purchasedUpgrades.get(i).getBuildingMult();
+			}
+		}
+		return cursorMult;
+	}
+
 }
