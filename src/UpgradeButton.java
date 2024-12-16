@@ -30,10 +30,9 @@ public class UpgradeButton {
 					game.setCurrentCookies(game.getCurrentCookies() - upgrade.getPrice());
 					panel.remove(button);
 					panel.remove(tooltip);
-					button.setVisible(false);
+					//button.setVisible(false);
 					panel.revalidate();
 					panel.repaint();
-					System.out.println(button.isVisible());
 				}
 			}
 		});

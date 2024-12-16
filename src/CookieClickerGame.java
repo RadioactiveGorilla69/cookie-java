@@ -8,10 +8,13 @@ import javax.swing.*;
 public class CookieClickerGame {
 
 	private int currentCookies = 0;
+	private int lifeTimeCookies = 0;
 	private Building[] buildings = new Building[5];
 	private ArrayList<Upgrade> availableUpgrades = new ArrayList<Upgrade>();
 	private ArrayList<Upgrade> purchasedUpgrades = new ArrayList<Upgrade>();
-	private ArrayList<Upgrade> upgradeStorage = new ArrayList<Upgrade>();
+	private Achievement[] achievements = new Achievement[6];
+	private ArrayList<Achievement> earnedAchievements = new ArrayList<Achievement>();
+	
 	Upgrade test = new Upgrade("Test", 1, 100, 5, 0);
 	Upgrade cursorTest = new Upgrade("Cursor Test", 1, 2, 20, 1);
 	private UpgradeButton cursorTestButton;
@@ -23,7 +26,7 @@ public class CookieClickerGame {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		JPanel panel = new JPanel();
 		panel.setLayout(null);
-		panel.setBounds(0, 0, 800, 600);
+		panel.setBounds(0, 0, 1536, 864);
 		panel.setBackground(new Color(50,130,200));
 
 		JLabel labelCookies = new JLabel();
@@ -40,9 +43,9 @@ public class CookieClickerGame {
 		Cookie bigCookie = new Cookie(panel, game);
 
 		game.createBuildings(game);
-
 		game.createBuildingButtons(panel, game);
-
+		
+		game.createAchievements(game);
 
 		game.availableUpgrades.add(game.test);
 		game.availableUpgrades.add(game.cursorTest);
@@ -54,9 +57,9 @@ public class CookieClickerGame {
 		frame.setVisible(true);
 
 		while(true) {
-			game.addAvailableUpgrades(game, panel);
-			//System.out.println(game.purchasedUpgrades.size());
-			game.updateCurrentCookies();
+			game.addAvailableUpgrades();
+			game.checkAchievements(panel, game);
+			game.updateCookies();
 			int cPS = game.makeCookiesPerSecond(game.buildings, game.purchasedUpgrades);
 			labelCookies.setText("<html>Cookies: " + game.getCurrentCookies() + "<br><span style='font-size:14px;'>per second: " + cPS + "</html>");
 
@@ -89,17 +92,25 @@ public class CookieClickerGame {
 		return cPC;
 	}
 
-	public int updateCurrentCookies() {
-		return setCurrentCookies(getCurrentCookies() + (makeCookiesPerSecond(getBuildings(), getPurchasedUpgrades())));
+	public void updateCookies() {
+		setCurrentCookies(getCurrentCookies() + (makeCookiesPerSecond(getBuildings(), getPurchasedUpgrades())));
+		setLifeTimeCookies(getCurrentCookies() + (makeCookiesPerSecond(getBuildings(), getPurchasedUpgrades())));
 	}
 
 	public int getCurrentCookies() {
 		return currentCookies;
 	}
+	
+	public int getLifeTimeCookies() {
+		return lifeTimeCookies;
+	}
 
-	public int setCurrentCookies(double currentCookies) {
+	public void setCurrentCookies(double currentCookies) {
 		this.currentCookies = (int)currentCookies;
-		return (int)currentCookies;
+	}
+	
+	public void setLifeTimeCookies(double lifeTimeCookies) {
+		this.lifeTimeCookies = (int)lifeTimeCookies;
 	}
 
 	public ArrayList<Upgrade> getPurchasedUpgrades() {
@@ -142,10 +153,10 @@ public class CookieClickerGame {
 		game.buildings[4] = new Building("Factory", 2000, 50000, 0);
 	}
 
-	public void addAvailableUpgrades(CookieClickerGame game, JPanel panel) {
-		if(game.purchasedUpgrades.contains(game.availableUpgrades.get(1)) == false) {
-			if(game.buildings[0].getBuildingCount() > 9) {
-				game.cursorTestButton.setUpgradeVisible(true);
+	public void addAvailableUpgrades() {
+		if(purchasedUpgrades.contains(availableUpgrades.get(1)) == false) {
+			if(buildings[0].getBuildingCount() > 9) {
+				cursorTestButton.setUpgradeVisible(true);
 			}
 		}
 
@@ -169,4 +180,52 @@ public class CookieClickerGame {
 		return cursorMult;
 	}
 
+	public void checkAchievements(JPanel panel, CookieClickerGame game) {
+		if(!earnedAchievements.contains(getAchievements()[0]) && getLifeTimeCookies() > 0) {
+			earnedAchievements.add(getAchievements()[0]);
+			new AchievementPopup(getAchievements()[0].getName(), panel, game);
+		}
+		if(!earnedAchievements.contains(getAchievements()[1]) && getLifeTimeCookies() > 9) {
+			earnedAchievements.add(getAchievements()[1]);
+			new AchievementPopup(getAchievements()[1].getName(), panel, game);
+		}
+		if(!earnedAchievements.contains(getAchievements()[2]) && totalBuildingCount() > 0) {
+			earnedAchievements.add(getAchievements()[2]);
+			new AchievementPopup(getAchievements()[2].getName(), panel, game);
+		}
+		if(!earnedAchievements.contains(getAchievements()[3]) && totalBuildingCount() > 9) {
+			earnedAchievements.add(getAchievements()[3]);
+			new AchievementPopup(getAchievements()[3].getName(), panel, game);
+		}
+		if(!earnedAchievements.contains(getAchievements()[4]) && buildings[1].getBuildingCount() > 0) {
+			earnedAchievements.add(getAchievements()[4]);
+			new AchievementPopup(getAchievements()[4].getName(), panel, game);
+		}
+	}
+
+	public Achievement[] getAchievements() {
+		return achievements;
+	}
+
+	public void setAchievements(Achievement[] achievements) {
+		this.achievements = achievements;
+	}
+	
+	public void createAchievements(CookieClickerGame game) {
+		achievements[0] = new Achievement("Bake a cookie", 0);
+		achievements[1] = new Achievement("Bake ten cookies", 1);
+		achievements[2] = new Achievement("Buy a building", 2);
+		achievements[3] = new Achievement("Buy ten buildings", 3);
+		achievements[4] = new Achievement("Buy a grandma", 4);
+		achievements[5] = new Achievement("Bake one million cookies", 5);
+	}
+	
+	public int totalBuildingCount() {
+		int sum = 0;
+		for(int i = 0; i < buildings.length; i++) {
+			sum += buildings[i].getBuildingCount();
+		}
+		return sum;
+	}
+	
 }

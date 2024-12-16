@@ -14,7 +14,7 @@ public class BuildingButton {
 		tooltip.setFont(new Font("Comic Sans MS", Font.PLAIN, 16));
 		Building building = game.getBuildings()[buildingNumber];
 		button = new JButton("<html>" + building.getName() + "<br>Price: " + building.getPrice() + " Cookies" + "<br>Owned: " + building.getBuildingCount() + "</html>");
-		button.setBounds(1236, 250 + (buildingNumber*120), 300, 120);
+		button.setBounds(1236, 225 + (buildingNumber*120), 300, 120);
 		button.setFont(new Font("Comic Sans MS", Font.PLAIN, 20));
 		
 		JLabel labelOwned = new JLabel("Owned: " + building.getBuildingCount());
